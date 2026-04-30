@@ -17,6 +17,7 @@ class CommentsController extends Controller
        return view("admin.comments.index", ["comments"=> $topLevelComments,"replies"=> $replies]);
     }
 
+
     public function destroy(Comment $comment)
     {
         $comment->delete();

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CommentPublished;
+use App\Events\ReplyPublished;
 use App\Mail\NewCommentCreated;
 use App\Mail\NewReplyCreated;
 use App\Models\Comment;
@@ -26,9 +28,11 @@ class CommentsController extends Controller
         ]);
 
         if($comment->parent_id && $comment->user_id != $comment->parent->user_id){
-            Mail::to($comment->parent->user->email)->later( now()->addSeconds(1) ,new NewReplyCreated($comment));
+            // Mail::to($comment->parent->user->email)->later( now()->addSeconds(1) , new NewReplyCreated($comment));
+            ReplyPublished::dispatch($comment);
         }else if ($comment->parent_id === null && $comment->user_id != $comment->post->user_id){
-            Mail::to($comment->post->user->email)->later( now()->addSeconds(1) ,new NewCommentCreated($comment));
+            // Mail::to($comment->post->user->email)->later( now()->addSeconds(1) , new NewCommentCreated($comment));
+            CommentPublished::dispatch($comment);
         }
 
         return back()->with('success', 'Comment created successfully');

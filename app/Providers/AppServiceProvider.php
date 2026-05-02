@@ -2,13 +2,18 @@
 
 namespace App\Providers;
 
-use App\Models\Comment as ModelsComment;
+use App\Events\CommentPublished;
+use App\Events\PostPublished;
+use App\Events\ReplyPublished;
+use App\Listeners\SendCommentPublishNotification;
+use App\Listeners\SendPostPublishNotification;
+use App\Listeners\SendReplyPublishNotification;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Comment;
 use App\Policies\CommentPolicy;
 use App\Policies\PostPolicy;
-use Dom\Comment as DomComment;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -44,5 +49,9 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::policy(Post::class, PostPolicy::class);
         Gate::policy(Comment::class, CommentPolicy::class);
+
+        Event::listen(PostPublished::class, SendPostPublishNotification::class);
+        Event::listen(CommentPublished::class, SendCommentPublishNotification::class);
+        Event::listen(ReplyPublished::class, SendReplyPublishNotification::class);
     }
 }
